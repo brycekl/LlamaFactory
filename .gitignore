@@ -169,6 +169,11 @@ uv.lock
 .DS_Store
 
 # custom .gitignore
+data
+datas
+!data/*.json
+medsys/stage1/models/
+medsys/stage2/models/
 hf_cache/
 ms_cache/
 om_cache/

@@ -1,0 +1,58 @@
+### model
+model_name_or_path: Qwen/Qwen3-VL-2B-Instruct
+image_max_pixels: 65536
+video_max_pixels: 16384
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj,linear_fc1,linear_fc2
+freeze_vision_tower: true
+freeze_multi_modal_projector: false
+freeze_language_model: false
+
+### dataset
+dataset: roco_train
+template: qwen3_vl_nothink
+cutoff_len: 1024
+# max_samples: 1000
+preprocessing_num_workers: 8
+dataloader_num_workers: 2  
+dataloader_pin_memory: true 
+dataloader_prefetch_factor: 2
+
+### output
+output_dir: medsys/stage1/models/qwen3vl-2B_lora_stage1-bs2
+logging_steps: 10
+save_steps: 250
+save_total_limit: 3
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+use_swanlab: true
+swanlab_project: medsys
+swanlab_run_name: qwen3vl-2B_lora_stage1_bs2
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+eval_dataset: roco_val
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 250
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false

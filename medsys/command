@@ -1,0 +1,24 @@
+# 为防止ssh断开影响，使用screen
+conda activate llamafactory
+export HF_ENDPOINT=https://hf-mirror.com  # 使用hf镜像
+export HF_HUB_OFFLINE=1  # hf离线模式
+
+# 训练
+llamafactory-cli train medsys/stage1/qwen3vl-2B_lora_stage1_projector_full.yaml
+
+# predict by vllm
+python scripts/vllm_infer.py \
+  --model_name_or_path Qwen/Qwen3-VL-2B-Instruct \
+  --template qwen3_vl_nothink \
+  --dataset roco_test \
+  --dataset_dir data \
+  --max_samples 50 \
+  --cutoff_len 1024 \
+  --max_new_tokens 128 \
+  --save_name medsys/stage1/models/qwen3vl-2B_base/predict/generated_predictions.jsonl \
+  --image_max_pixels 65536
+# --adapter_name_or_path medsys/stage1/models/qwen3vl-2B_lora_stage1/checkpoint-14000
+
+# predict
+# 指标计算，自写指标
+python scripts/eval_caption_metrics_en.py medsys/stage1/models/qwen3vl-2B_lora_stage1/predict/generated_predictions.jsonl
